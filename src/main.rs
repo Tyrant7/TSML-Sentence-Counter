@@ -22,8 +22,46 @@ fn main() {
         prepared_text = prepared_text.replace(symbol, "dummy");
     }
 
-    // Now we'll count up each sentence type's length
+    // Define our sentence lengths and corresponding label
+    let sentence_types = [
+        SentenceType {
+            label: "T".to_string(),
+            min_length: 1,
+        },
+        SentenceType {
+            label: "S".to_string(),
+            min_length: 5,
+        },
+        SentenceType {
+            label: "M".to_string(),
+            min_length: 11,
+        },
+        SentenceType {
+            label: "L".to_string(),
+            min_length: 26,
+        },
+    ];
+    let mut sentence_counts = vec![0; sentence_types.len()];
 
-    println!("You entered: ");
-    println!("{}", prepared_text);
+    // Iterate over sentences in text to find their lengths
+    for sentence in prepared_text.split(".") {
+        let word_count = sentence.split_whitespace().count();
+
+        // Find the first sentence type that supports less than or equal to this sentence's count
+        // Here we need to iterate backwards and subtract the index
+        let matching_index = sentence_types.len() - 1 - sentence_types.iter().rev().enumerate().position(
+            |t| t.1.min_length <= word_count
+        ).unwrap_or_default();
+        sentence_counts[matching_index] += 1;
+    }
+
+    // Print our each sentence type and its count
+    for (i, sentence_type) in sentence_types.iter().enumerate() {
+        println!("{} - {}", sentence_type.label, sentence_counts[i])
+    }
+}
+
+struct SentenceType {
+    label: String,
+    min_length: usize,
 }
