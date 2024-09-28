@@ -22,6 +22,12 @@ fn main() {
         prepared_text = prepared_text.replace(symbol, "dummy");
     }
 
+    // TODO: Let's also remove citations
+    
+    // TODO: Remove ellipses, and replace question marks and exclammation marks
+
+    // TODO: Unit tests
+
     // Define our sentence lengths and corresponding label
     let sentence_types = [
         SentenceType {
@@ -59,6 +65,7 @@ fn main() {
     for (i, sentence_type) in sentence_types.iter().enumerate() {
         println!("{} - {}", sentence_type.label, sentence_counts[i])
     }
+    io::stdin().read_line(&mut String::new()).unwrap();
 }
 
 struct SentenceType {
