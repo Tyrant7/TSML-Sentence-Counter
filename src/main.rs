@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, io};
+use std::io;
 use regex::Regex;
 
 fn main() {
@@ -18,7 +18,7 @@ fn main() {
 
     // Let's replace all of these symbols in the text with a dummy word for counting
     // to avoid confusing these as additional sentences
-    let mut prepared_text = input.to_lowercase();
+    let mut prepared_text = input.trim().to_lowercase();
     for symbol in exclude_symbols {
         prepared_text = prepared_text.replace(symbol, "dummy");
     }
@@ -50,8 +50,8 @@ fn main() {
     let mut sentence_counts = vec![0; sentence_types.len()];
 
     // Iterate over sentences in text to find their lengths
-    for mut sentence in prepared_text.split(".").map(|s| s.to_string()) {
-     
+    for mut sentence in prepared_text.split(".").map(|s| s.trim().to_string()) {
+
         // Let's discount any citations in brackets
         let mut to_remove = Vec::new();
         let re = Regex::new(r"\(([^)]+)\)").unwrap();
@@ -82,10 +82,11 @@ fn main() {
         // Find the first sentence type that supports less than or equal to this sentence's count
         // Here we need to iterate backwards and subtract the index
         let word_count = sentence.split_whitespace().count();
-        let matching_index = sentence_types.len() - 1 - sentence_types.iter().rev().enumerate().position(
+        if let Some(matching_index) = sentence_types.iter().rev().enumerate().position(
             |t| t.1.min_length <= word_count
-        ).unwrap_or_default();
-        sentence_counts[matching_index] += 1;
+        ) {
+            sentence_counts[sentence_types.len() - 1 - matching_index] += 1;
+        }
     }
 
     // Print our each sentence type and its count
