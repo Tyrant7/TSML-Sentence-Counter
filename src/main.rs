@@ -1,4 +1,5 @@
-use std::io;
+use std::{borrow::BorrowMut, io};
+use regex::Regex;
 
 fn main() {
     // Collect user input
@@ -22,15 +23,10 @@ fn main() {
         prepared_text = prepared_text.replace(symbol, "dummy");
     }
 
-    // Remove ellipses, and replace question marks and exclamation marks
+    // Remove bootleg ellipses, and replace question marks and exclamation marks
     prepared_text = prepared_text.replace("...", "");
     prepared_text = prepared_text.replace("?", ".");
     prepared_text = prepared_text.replace("!", ".");
-
-    // TODO: Let's also remove citations
-    
-
-    // TODO: Unit tests
 
     // Define our sentence lengths and corresponding label
     let sentence_types = [
@@ -54,11 +50,38 @@ fn main() {
     let mut sentence_counts = vec![0; sentence_types.len()];
 
     // Iterate over sentences in text to find their lengths
-    for sentence in prepared_text.split(".") {
-        let word_count = sentence.split_whitespace().count();
+    for mut sentence in prepared_text.split(".").map(|s| s.to_string()) {
+     
+        // Let's discount any citations in brackets
+        let mut to_remove = Vec::new();
+        let re = Regex::new(r"\(([^)]+)\)").unwrap();
+        for capture in re.captures_iter(&sentence) {
+            let text_in_brackets = &capture[1];
+
+            // This cryptic expression denotes any correct MLA citation format
+            // We will match on the following formats:
+            // (2)
+            // (5 Author)
+            let citation_re = Regex::new(r"^\d+(\s[A-Z][a-zA-Z]*)?$").unwrap();
+            if citation_re.is_match(text_in_brackets) {
+                let index = sentence.find(text_in_brackets).unwrap();
+
+                // Remove one additional character in each direction to account
+                // for the brackets
+                to_remove.push((index - 1, index + text_in_brackets.len() + 1))
+            }
+        }
+        
+        // Remove the citation we found to not count them against the word count
+        // We'll iterate backwards since the ranges of later citations will change 
+        // when removing earlier ones and we don't want that
+        for &(start, end) in to_remove.iter().rev() {
+            sentence.replace_range(start..end, "");
+        }
 
         // Find the first sentence type that supports less than or equal to this sentence's count
         // Here we need to iterate backwards and subtract the index
+        let word_count = sentence.split_whitespace().count();
         let matching_index = sentence_types.len() - 1 - sentence_types.iter().rev().enumerate().position(
             |t| t.1.min_length <= word_count
         ).unwrap_or_default();
@@ -76,3 +99,6 @@ struct SentenceType {
     label: String,
     min_length: usize,
 }
+
+
+    // TODO: Unit tests
