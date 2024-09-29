@@ -89,6 +89,9 @@ fn main() {
         }
     }
 
+    // TODO: Print out text with sentences highlighted by length
+    // unique colour for each sentence type
+    
     // Print our each sentence type and its count
     for (i, sentence_type) in sentence_types.iter().enumerate() {
         println!("{} - {}", sentence_type.label, sentence_counts[i])
@@ -101,5 +104,4 @@ struct SentenceType {
     min_length: usize,
 }
 
-
-    // TODO: Unit tests
+// TODO: Unit tests
