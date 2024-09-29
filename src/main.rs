@@ -9,18 +9,18 @@ fn main() {
 
     let exclude_symbols = [
         // Titles
-        "mr.", "mrs.", "ms.", "messrs.", "mmes.", "msgr.", 
-        "prof.", "dr.", "esq.", "rev.", "sr.", "jr.", "st.", "mlle.", "mme.",
+        "mr", "mrs", "ms", "messrs", "mmes", "msgr", 
+        "prof", "dr", "esq", "rev", "sr", "jr", "st", "mlle", "mme",
         // Streets
-        "ave.", "blvd.", "bldg.", "crt.", "cres.", "dr.", "pl.", "rd.", "sq.",
-        "stn.", "st.", "terr."
+        "ave", "blvd", "bldg", "crt", "cres", "dr", "pl", "rd", "sq",
+        "stn", "st", "terr"
     ];
 
     // Let's replace all of these symbols in the text with a dummy word for counting
     // to avoid confusing these as additional sentences
     let mut prepared_text = input.trim().to_lowercase();
     for symbol in exclude_symbols {
-        prepared_text = prepared_text.replace(symbol, "dummy");
+        prepared_text = prepared_text.replace(format!(" {symbol}. ").as_str(), " dummy ");
     }
 
     // Remove bootleg ellipses, and replace question marks and exclamation marks
