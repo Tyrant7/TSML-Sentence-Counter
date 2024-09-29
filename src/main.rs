@@ -35,7 +35,7 @@ fn main() {
         },
     ];
 
-    let mut sentences: Vec<Sentence> = Vec::new();
+    let mut sentence_counts = vec![0; sentence_types.len()];
 
     let exclude_symbols = [
         // Titles
@@ -47,6 +47,7 @@ fn main() {
     ];
 
     // Iterate over sentences in text to find their lengths
+    println!();
     for raw_sentence in input.split_inclusive(['.', '?', '!']).map(|s| s.trim().to_string()) {
     
         // let output = String::new();
@@ -91,23 +92,21 @@ fn main() {
         if let Some(matching_index) = sentence_types.iter().rev().enumerate().position(
             |t| t.1.min_length <= word_count
         ) {
-            sentences.push(Sentence {
-                content: raw_sentence,
-                sentence_type: sentence_types.len() - 1 - matching_index,
-            });
-        }
-    }
+            let sentence_type = sentence_types.len() - 1 - matching_index;
 
-    println!();
-    for sentence in sentences.iter() {
-        print!("{}", (sentence_types[sentence.sentence_type].colour)(sentence.content.clone().into()));
+            // Print the sentence with highlighting
+            let mut finished_raw_sentence = raw_sentence;
+            finished_raw_sentence.push(' ');
+            print!("{}", (sentence_types[sentence_type].colour)(finished_raw_sentence.into()));
+
+            sentence_counts[sentence_type] += 1;
+        }
     }
     println!();
     
     // Print our each sentence type and its count
     for (i, sentence_type) in sentence_types.iter().enumerate() {
-        let count = sentences.iter().filter(|s| s.sentence_type == i).count();
-        println!("{} - {}", sentence_type.label, count);
+        println!("{} - {}", sentence_type.label, sentence_counts[i]);
     }
     io::stdin().read_line(&mut String::new()).unwrap();
 }
@@ -116,11 +115,6 @@ struct SentenceType {
     label: String,
     min_length: usize,
     colour: fn(colored::ColoredString) -> colored::ColoredString,
-}
-
-struct Sentence {
-    content: String,
-    sentence_type: usize,
 }
 
 // TODO: Unit tests
