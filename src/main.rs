@@ -22,9 +22,13 @@ fn main() {
         prepared_text = prepared_text.replace(symbol, "dummy");
     }
 
+    // Remove ellipses, and replace question marks and exclamation marks
+    prepared_text = prepared_text.replace("...", "");
+    prepared_text = prepared_text.replace("?", ".");
+    prepared_text = prepared_text.replace("!", ".");
+
     // TODO: Let's also remove citations
     
-    // TODO: Remove ellipses, and replace question marks and exclammation marks
 
     // TODO: Unit tests
 
