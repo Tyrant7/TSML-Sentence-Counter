@@ -95,9 +95,8 @@ fn main() {
             let sentence_type = sentence_types.len() - 1 - matching_index;
 
             // Print the sentence with highlighting
-            let mut finished_raw_sentence = raw_sentence;
-            finished_raw_sentence.push(' ');
-            print!("{}", (sentence_types[sentence_type].colour)(finished_raw_sentence.into()));
+            print!("{}", (sentence_types[sentence_type].colour)(raw_sentence[..raw_sentence.len() - 1].into()));
+            print!("{} ", raw_sentence.chars().last().unwrap_or('*').to_string().on_white());
 
             sentence_counts[sentence_type] += 1;
         }
