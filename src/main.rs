@@ -1,5 +1,6 @@
 use std::io;
 use regex::Regex;
+use colored::Colorize;
 
 fn main() {
     // Collect user input
@@ -7,23 +8,30 @@ fn main() {
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("error: no text provided");
 
+    // Fix bootleg ellipses
+    input = input.replace("...", "…");
+
     // Define our sentence lengths and corresponding label
     let sentence_types = [
         SentenceType {
             label: "T".to_string(),
             min_length: 1,
+            colour: Colorize::blue,
         },
         SentenceType {
             label: "S".to_string(),
             min_length: 5,
+            colour: Colorize::bright_green,
         },
         SentenceType {
             label: "M".to_string(),
             min_length: 11,
+            colour: Colorize::yellow,
         },
         SentenceType {
             label: "L".to_string(),
             min_length: 26,
+            colour: Colorize::red,
         },
     ];
 
@@ -39,19 +47,16 @@ fn main() {
     ];
 
     // Iterate over sentences in text to find their lengths
-    for raw_sentence in input.split(".").map(|s| s.trim().to_string()) {
+    for raw_sentence in input.split_inclusive(['.', '?', '!']).map(|s| s.trim().to_string()) {
     
+        // let output = String::new();
+
         // Let's replace all of symbols with periods in them in the sentence with a 
         // dummy word for counting to avoid confusing these as additional sentences
         let mut prepared_sentence = raw_sentence.trim().to_lowercase();
         for symbol in exclude_symbols {
             prepared_sentence = prepared_sentence.replace(format!(" {symbol}. ").as_str(), " dummy ");
         }
-    
-        // Remove bootleg ellipses, and replace question marks and exclamation marks
-        prepared_sentence = prepared_sentence.replace("...", "");
-        prepared_sentence = prepared_sentence.replace("?", ".");
-        prepared_sentence = prepared_sentence.replace("!", ".");
 
         // Let's discount any citations in brackets
         let mut to_remove = Vec::new();
@@ -86,18 +91,16 @@ fn main() {
         if let Some(matching_index) = sentence_types.iter().rev().enumerate().position(
             |t| t.1.min_length <= word_count
         ) {
-            let mut content = raw_sentence;
-            content.push_str(". ");
             sentences.push(Sentence {
-                content,
+                content: raw_sentence,
                 sentence_type: sentence_types.len() - 1 - matching_index,
             });
         }
     }
 
-    println!("You entered: ");
+    println!();
     for sentence in sentences.iter() {
-        print!("{}", sentence.content);
+        print!("{}", (sentence_types[sentence.sentence_type].colour)(sentence.content.clone().into()));
     }
     println!();
     
@@ -112,6 +115,7 @@ fn main() {
 struct SentenceType {
     label: String,
     min_length: usize,
+    colour: fn(colored::ColoredString) -> colored::ColoredString,
 }
 
 struct Sentence {
