@@ -39,11 +39,13 @@ fn main() {
 
     let exclude_symbols = [
         // Titles
-        "mr", "mrs", "ms", "messrs", "mmes", "msgr", 
+        "mr", "mrs", "m", "ms", "messrs", "mmes", "msgr", 
         "prof", "dr", "esq", "rev", "sr", "jr", "st", "mlle", "mme",
         // Streets
         "ave", "blvd", "bldg", "crt", "cres", "dr", "pl", "rd", "sq",
-        "stn", "st", "terr"
+        "stn", "st", "terr",
+        // Business
+        "ltd", "inc", "corp",
     ];
 
     // Iterate over sentences in text to find their lengths
