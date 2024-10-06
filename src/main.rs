@@ -52,8 +52,6 @@ fn main() {
     println!();
     for raw_sentence in input.split_inclusive(['.', '?', '!']).map(|s| s.trim().to_string()) {
     
-        // let output = String::new();
-
         // Let's replace all of symbols with periods in them in the sentence with a 
         // dummy word for counting to avoid confusing these as additional sentences
         let mut prepared_sentence = raw_sentence.trim().to_lowercase();
@@ -98,6 +96,7 @@ fn main() {
 
             // Print the sentence with highlighting
             print!("{}", (sentence_types[sentence_type].colour)(raw_sentence[..raw_sentence.len() - 1].into()));
+            print!("<{}>", word_count);
             print!("{} ", raw_sentence.chars().last().unwrap_or('*').to_string().on_white());
 
             sentence_counts[sentence_type] += 1;
