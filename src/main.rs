@@ -50,14 +50,14 @@ fn main() {
 
     // Iterate over sentences in text to find their lengths
     println!();
+    // Let's replace all of symbols with periods in them in the sentence with a 
+    // dummy word for counting to avoid confusing these as additional sentences
+    input = input.trim().to_lowercase();
+    for symbol in exclude_symbols {
+        input = input.replace(format!("{symbol}.").as_str(), "dummy");
+    }
     for raw_sentence in input.split_inclusive(['.', '?', '!']).map(|s| s.trim().to_string()) {
-    
-        // Let's replace all of symbols with periods in them in the sentence with a 
-        // dummy word for counting to avoid confusing these as additional sentences
-        let mut prepared_sentence = raw_sentence.trim().to_lowercase();
-        for symbol in exclude_symbols {
-            prepared_sentence = prepared_sentence.replace(format!(" {symbol}. ").as_str(), " dummy ");
-        }
+        let mut prepared_sentence = raw_sentence.clone();
 
         // Let's discount any citations in brackets
         let mut to_remove = Vec::new();
